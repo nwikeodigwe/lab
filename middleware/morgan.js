@@ -1,8 +1,8 @@
 import morgan from "morgan";
-import { info } from "../utils/Logger";
+import { logger } from "../utils/Logger.js";
 
 export default morgan("combined", {
   stream: {
-    write: (message) => info(message.trim()),
+    write: (message) => logger.info(message.trim()),
   },
 });

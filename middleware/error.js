@@ -1,4 +1,4 @@
-import logger from "../utils/Logger";
+import logger from "../utils/Logger.js";
 import { status } from "http-status";
 
 export default function (err, req, res, next) {
