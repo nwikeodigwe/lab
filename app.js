@@ -1,9 +1,10 @@
+import "dotenv/config";
 import express from "express";
 import { logger } from "./utils/Logger.js";
 const app = express();
 
 // import "./auth/passport";
-// import "./startup/routes";
+import "./startup/routes";
 // import "./startup/prod";
 
 export default app;
