@@ -2,11 +2,12 @@ import "dotenv/config";
 import express from "express";
 import mongoose from "mongoose";
 import { logger } from "./utils/Logger.js";
+import routes from "./startup/routes.js";
+import prod from "./startup/prod.js";
 const app = express();
 
-// import "./auth/passport";
-import "./startup/routes.js";
-import "./startup/prod";
+routes(app);
+prod(app);
 
 export default app;
 

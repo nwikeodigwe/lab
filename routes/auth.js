@@ -1,120 +1,124 @@
 import express from "express";
-import User from "../models/User.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import _ from "lodash";
+import Auth from "../models/auth.js";
 import { status } from "http-status";
 
 const router = express.Router();
 
 router.post("/signup", async (req, res) => {
-  if (!req.body.email || !req.body.password)
-    return res.status(status.BAD_REQUEST).json({
-      message: status[status.BAD_REQUEST],
-      description: "Email and password is required",
+  const password = bcrypt.hashSync(req.body.password, 10);
+  let auth = new Auth({
+    email: req.body.email,
+    password: password,
+  });
+
+  const user = await Auth.findOne({ email: req.body.email });
+
+  if (user) {
+    return res.status(status.CONFLICT).json({
+      message: "User already exists",
     });
+  }
 
-  let user = new User();
-  user.email = req.body.email;
-  user.password = req.body.password;
+  auth = await auth.save();
 
-  let userExits = await user.find();
-
-  if (userExits)
-    return res.status(status.BAD_REQUEST).json({
-      message: status[status.BAD_REQUEST],
-      description: "User already exists",
-    });
-
-  await user.save();
-  await user.mail(mailconf.welcome);
-
-  const login = await user.login();
+  const token = jwt.sign(
+    {
+      exp: Math.floor(Date.now() / 1000) + 60 * 60,
+      data: _.pick(auth, ["id", "email", "createdAt"]),
+    },
+    process.env.JWT_PRIVATE_KEY
+  );
 
   return res
     .status(status.CREATED)
-    .json({ message: status[status.CREATED], login });
+    .json({ message: status[status.CREATED], token });
 });
 
 router.post("/signin", async (req, res) => {
-  if (!req.body.email || !req.body.password)
-    return res.status(status.BAD_REQUEST).json({
-      message: status[status.BAD_REQUEST],
-      description: "Email and password is required",
-    });
+  let auth = new Auth();
+  auth.email = req.body.email;
+  auth.password = req.body.password;
 
-  let user = new User();
-  user.email = req.body.email;
-  user.password = req.body.password;
+  let user = await Auth.findOne({ email: auth.email });
 
-  let userExists = await user.find();
-
-  if (!userExists)
+  if (!user)
     return res.status(status.NOT_FOUND).json({
       message: status[status.NOT_FOUND],
       description: "Invalid credentials",
     });
 
-  const passwordMatch = await user.passwordMatch();
+  const password = await bcrypt.compare(auth.password, user.password);
 
-  if (!passwordMatch)
+  if (!password)
     return res.status(status.BAD_REQUEST).json({
       message: status[status.BAD_REQUEST],
       description: "Invalid credentials",
     });
 
-  const login = await user.login();
+  const token = jwt.sign(
+    {
+      exp: Math.floor(Date.now() / 1000) + 60 * 60,
+      data: _.pick(user, ["id", "email", "createdAt"]),
+    },
+    process.env.JWT_PRIVATE_KEY
+  );
 
-  return res.status(status.OK).json({ message: status[status.OK], login });
+  return res.status(status.OK).json({ message: status[status.OK], token });
 });
 
 router.post("/reset", async (req, res) => {
-  if (!req.body.email)
-    return res.status(status.BAD_REQUEST).json({
-      message: status[status.BAD_REQUEST],
-      description: "Email is required",
-    });
+  let user = await Auth.findOne({ email: req.body.email });
 
-  let user = new User();
-  user.email = req.body.email;
-  let userExits = await user.find();
-
-  if (!userExits)
+  if (!user)
     return res.status(status.NOT_FOUND).json({
       message: status[status.NOT_FOUND],
       description: "Invalid request",
     });
 
-  await user.createResetToken();
+  user.reset.token = jwt.sign(
+    {
+      exp: Math.floor(Date.now() / 1000) + 60 * 60,
+      data: _.pick(user, ["id", "email"]),
+    },
+    process.env.JWT_PRIVATE_KEY
+  );
+
+  await user.save();
 
   return res.status(status.OK).end();
 });
 
 router.post("/reset/:token", async (req, res) => {
-  if (!req.params.token || !req.body.password)
+  const decoded = jwt.verify(req.params.token, process.env.JWT_PRIVATE_KEY);
+
+  if (!decoded)
     return res.status(status.BAD_REQUEST).json({
       message: status[status.BAD_REQUEST],
       description: "Invalid request",
     });
 
-  let user = new User();
-  user.resetToken = req.params.token;
-
-  const isValidResetToken = await user.isValidResetToken();
-
-  if (!isValidResetToken)
-    return res.status(status.BAD_REQUEST).json({
-      message: status[status.BAD_REQUEST],
+  const user = await Auth.findOne({ "reset.token": req.params.token });
+  if (!user) {
+    return res.status(status.NOT_FOUND).json({
+      message: status[status.NOT_FOUND],
       description: "Invalid request",
     });
+  }
 
-  user.password = req.body.password;
-  user.id = isValidResetToken.user.id;
-
-  await user.save();
-
-  login = await user.login();
+  const token = jwt.sign(
+    {
+      exp: Math.floor(Date.now() / 1000) + 60 * 60,
+      data: _.pick(user, ["id", "email", "createdAt"]),
+    },
+    process.env.JWT_PRIVATE_KEY
+  );
 
   return res
     .status(status.OK)
-    .json({ message: status[status.OK], data: login });
+    .json({ message: status[status.OK], data: token });
 });
 
 export default router;
