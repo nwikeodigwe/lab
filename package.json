@@ -15,7 +15,7 @@
   "author": "Nwike Odigwe",
   "main": "server.js",
   "scripts": {
-    "test": "jest --detectOpenHandles",
+    "test": "jest --detectOpenHandles --watchAll",
     "start": "nodemon server.js"
   },
   "dependencies": {
