@@ -47,6 +47,7 @@ describe("Auth Routes", () => {
       const res = await request(server)
         .post("/api/auth/signup")
         .send({ email: user.email, password: user.password });
+      console.log(res.body);
       expect(res.status).toBe(status.CREATED);
       expect(res.body).toHaveProperty("token");
     });
@@ -71,6 +72,7 @@ describe("Auth Routes", () => {
       const res = await request(server)
         .post("/api/auth/signin")
         .send({ email: user.email, password: user.password });
+      console.log(res.body);
       expect(res.status).toBe(status.OK);
       expect(res.body).toHaveProperty("token");
     });
