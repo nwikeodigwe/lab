@@ -31,8 +31,9 @@ describe("Auth Routes", () => {
   });
 
   afterAll(async () => {
-    await Auth.deleteOne({ email: user.email });
+    await Auth.deleteMany({});
     await mongoose.disconnect();
+    server.close();
   });
 
   describe("POST /api/auth/signup", () => {
@@ -61,6 +62,12 @@ describe("Auth Routes", () => {
 
   describe("POST /api/auth/signin", () => {
     it("should sign in an existing user and return a token", async () => {
+      mockResponse = response(status.OK, status[status.OK]);
+
+      jest
+        .spyOn(request(server), HTTP_METHODS.POST)
+        .mockReturnValue(mockResponse);
+
       const res = await request(server)
         .post("/api/auth/signin")
         .send({ email: user.email, password: user.password });

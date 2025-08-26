@@ -15,7 +15,7 @@
   "author": "Nwike Odigwe",
   "main": "server.js",
   "scripts": {
-    "test": "jest --watchAll --verbose --coverage --maxWorkers=75% --no-cache  --detectOpenHandles",
+    "test": "jest --detectOpenHandles",
     "start": "nodemon server.js"
   },
   "dependencies": {
