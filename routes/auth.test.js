@@ -47,7 +47,6 @@ describe("Auth Routes", () => {
       const res = await request(server)
         .post("/api/auth/signup")
         .send({ email: user.email, password: user.password });
-      console.log(res.body);
       expect(res.status).toBe(status.CREATED);
       expect(res.body).toHaveProperty("token");
     });
@@ -72,7 +71,6 @@ describe("Auth Routes", () => {
       const res = await request(server)
         .post("/api/auth/signin")
         .send({ email: user.email, password: user.password });
-      console.log(res.body);
       expect(res.status).toBe(status.OK);
       expect(res.body).toHaveProperty("token");
     });
@@ -82,6 +80,16 @@ describe("Auth Routes", () => {
         .post("/api/auth/signin")
         .send({ email: "", password: "" });
       expect([400, 404]).toContain(res.status);
+    });
+  });
+
+  describe("POST /api/auth/reset", () => {
+    it("should return 404 for non-existing user", async () => {
+      const res = await request(server)
+        .post("/api/auth/reset")
+        .send({ email: casual.email });
+      expect(res.status).toBe(status.NOT_FOUND);
+      expect(res.body.message).toBe(status[status.NOT_FOUND]);
     });
   });
 });
