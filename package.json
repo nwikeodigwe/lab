@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "backend service for careerlab",
   "homepage": "https://github.com/nwikeodigwe/lab#readme",
+  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/nwikeodigwe/lab/issues"
   },
@@ -12,14 +13,14 @@
   },
   "license": "ISC",
   "author": "Nwike Odigwe",
-  "type": "module",
-  "main": "app.ts",
+  "main": "server.js",
   "scripts": {
-    "test": "test",
-    "start": "nodemon app.js"
+    "test": "jest --watchAll --verbose --coverage --maxWorkers=75% --no-cache  --detectOpenHandles",
+    "start": "nodemon server.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "casual": "^1.6.2",
     "compression": "^1.8.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
@@ -31,11 +32,13 @@
     "lodash": "^4.17.21",
     "mongoose": "^8.18.0",
     "morgan": "^1.10.1",
+    "supertest": "^7.1.4",
     "swagger-ui-express": "^5.0.1",
     "winston": "^3.17.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
-    "@types/swagger-ui-express": "^4.1.8"
+    "@types/swagger-ui-express": "^4.1.8",
+    "jest": "^30.0.5"
   }
 }

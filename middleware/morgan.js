@@ -1,8 +1,8 @@
-import morgan from "morgan";
-import { logger } from "../utils/Logger.js";
+const morgan = require("morgan");
+const { info } = require("../utils/Logger");
 
-export default morgan("combined", {
+module.exports = morgan("combined", {
   stream: {
-    write: (message) => logger.info(message.trim()),
+    write: (message) => info(message.trim()),
   },
 });

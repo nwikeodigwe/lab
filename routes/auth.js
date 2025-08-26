@@ -1,9 +1,9 @@
-import express from "express";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import _ from "lodash";
-import Auth from "../models/auth.js";
-import { status } from "http-status";
+const express = require("express");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const _ = require("lodash");
+const Auth = require("../models/auth");
+const { status } = require("http-status");
 
 const router = express.Router();
 
@@ -121,4 +121,4 @@ router.post("/reset/:token", async (req, res) => {
     .json({ message: status[status.OK], data: token });
 });
 
-export default router;
+module.exports = router;

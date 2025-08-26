@@ -1,7 +1,7 @@
-import User from "../models/User.js";
-import { status } from "http-status";
+const Auth = require("../models/auth");
+const { status } = require("http-status");
 
-export default (req, res, next) => {
+module.exports = (req, res, next) => {
   const token = req.headers["authorization"]?.split(" ")[1];
 
   if (!token)

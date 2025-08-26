@@ -1,19 +1,16 @@
-import { readFile } from "fs/promises";
-import express from "express";
-import helmet from "helmet";
-import cors from "cors";
-import error from "../middleware/error.js";
-import morgan from "../middleware/morgan.js";
-import limiter from "../middleware/limiter.js";
-import auth from "../middleware/auth.js";
-import swaggerUi from "swagger-ui-express";
-import authRoute from "../routes/auth.js";
+const path = require("path");
+const express = require("express");
+const helmet = require("helmet");
+const cors = require("cors");
+const error = require("../middleware/error.js");
+const morgan = require("../middleware/morgan.js");
+const limiter = require("../middleware/limiter.js");
+const auth = require("../middleware/auth.js");
+const swaggerUi = require("swagger-ui-express");
+const authRoute = require("../routes/auth.js");
+const swaggerDocument = require("../docs/swagger.json");
 
-const swaggerDocument = JSON.parse(
-  await readFile(new URL("../docs/swagger.json", import.meta.url))
-);
-
-export default (app) => {
+module.exports = (app) => {
   app.use(cors());
   app.use(helmet());
   app.use(limiter);
