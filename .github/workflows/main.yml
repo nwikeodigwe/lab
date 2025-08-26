@@ -50,9 +50,5 @@ jobs:
 
       - name: Run tests
         env:
-          MONGODB_URI: mongodb://localhost:27017/lab-test
-          MONGODB_TEST_URI: mongodb://localhost:27017/lab-test
+          MONGODB_TEST_URI: mongodb://localhost:27017/test
         run: npm test
-
-volumes:
-  mongodb-data:
